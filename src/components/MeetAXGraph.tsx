@@ -12,7 +12,6 @@ type Props = {
   fxRate: number;
   width: number;
   height?: number;
-  onDeleteSession?: (id: string) => void;
 };
 
 type Period = 'ALL' | '1W' | '1M' | '3M';
@@ -62,12 +61,9 @@ export const MeetAXGraph: React.FC<Props> = ({
   fxRate,
   width,
   height = GRAPH_HEIGHT,
-  onDeleteSession,
 }) => {
   const [period, setPeriod] = useState<Period>('ALL');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
-  const [redacted, setRedacted] = useState(false);
 
   const plotWidth = width - AXIS_LEFT - AXIS_RIGHT;
   const plotHeight = height - AXIS_BOTTOM;
@@ -130,36 +126,7 @@ export const MeetAXGraph: React.FC<Props> = ({
   const selectedPoint = selectedIndex !== null ? points[selectedIndex] : null;
 
   const handleDotPress = (i: number) => {
-    if (deleteIndex !== null) {
-      setDeleteIndex(null);
-      return;
-    }
     setSelectedIndex(prev => prev === i ? null : i);
-  };
-
-  const handleDotLongPress = (i: number) => {
-    // Can't delete the current meeting (last dot)
-    if (isCurrentMeeting(i)) return;
-    setSelectedIndex(null);
-    setDeleteIndex(i);
-  };
-
-  const handleConfirmDelete = () => {
-    if (deleteIndex === null) return;
-    const record = allRecords[deleteIndex];
-    if (!record?.id) return;
-    setRedacted(true);
-    setDeleteIndex(null);
-    setSelectedIndex(null);
-    setTimeout(() => {
-      setRedacted(false);
-      onDeleteSession?.(record.id);
-    }, 2000);
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteIndex(null);
-    setSelectedIndex(null);
   };
 
   const isCurrentMeeting = (i: number) => i === allRecords.length - 1;
@@ -257,7 +224,6 @@ export const MeetAXGraph: React.FC<Props> = ({
                   cx={p.x} cy={p.y} r={DOT_TAP_RADIUS}
                   fill="transparent"
                   onPress={(e) => { e.stopPropagation(); handleDotPress(i); }}
-                  onLongPress={(e) => { e.stopPropagation(); handleDotLongPress(i); }}
                 />
                 {/* Visible dot */}
                 {isSelected && (
@@ -286,25 +252,9 @@ export const MeetAXGraph: React.FC<Props> = ({
         <Text style={styles.axisLabel}>COST ({currentCurrency})</Text>
       </View>
 
-      {/* Fixed info strip — shows selected dot data, delete confirmation, or prompt */}
+      {/* Fixed info strip — shows selected dot data or prompt */}
       <View style={styles.infoStrip}>
-        {redacted ? (
-          <Text style={styles.redactedText}>Redacted.</Text>
-        ) : deleteIndex !== null ? (
-          <View style={styles.deleteConfirm}>
-            <Text style={styles.deleteConfirmText}>
-              Delete session #{points[deleteIndex]?.sessionNum}? This cannot be undone.
-            </Text>
-            <View style={styles.deleteActions}>
-              <TouchableOpacity onPress={handleCancelDelete} style={styles.cancelBtn}>
-                <Text style={styles.cancelBtnText}>CANCEL</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleConfirmDelete} style={styles.deleteBtn}>
-                <Text style={styles.deleteBtnText}>DELETE</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : selected && selectedPoint ? (
+        {selected && selectedPoint ? (
           <View style={styles.infoContent}>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>SESSION</Text>
@@ -319,7 +269,7 @@ export const MeetAXGraph: React.FC<Props> = ({
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>COST</Text>
               <Text style={[styles.infoValue, styles.infoValueAccent]}>
-                {symbol}{(selected.cost * fxRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {symbol}{selected.cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
             </View>
             <View style={styles.infoDivider} />
@@ -329,7 +279,7 @@ export const MeetAXGraph: React.FC<Props> = ({
             </View>
           </View>
         ) : (
-          <Text style={styles.infoPrompt}>Tap a point to inspect · Hold to delete</Text>
+          <Text style={styles.infoPrompt}>Tap a point to inspect session</Text>
         )}
       </View>
     </View>
@@ -413,8 +363,8 @@ const styles = StyleSheet.create({
   },
   axisLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 7,
-    color: Colors.textDead,
+    fontSize: 9,
+    color: Colors.textMuted,
     letterSpacing: 1,
   },
 
@@ -457,56 +407,9 @@ const styles = StyleSheet.create({
   },
   infoPrompt: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
-    color: Colors.textDead,
+    fontSize: 10,
+    color: Colors.textMuted,
     textAlign: 'center',
     letterSpacing: 0.5,
-  },
-  redactedText: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 13,
-    color: Colors.red,
-    textAlign: 'center',
-    letterSpacing: 2,
-  },
-  deleteConfirm: {
-    gap: 8,
-    width: '100%',
-  },
-  deleteConfirmText: {
-    fontFamily: Fonts.mono,
-    fontSize: 10,
-    color: Colors.textSecondary,
-    letterSpacing: 0.3,
-  },
-  deleteActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  cancelBtn: {
-    flex: 1,
-    borderWidth: 0.5,
-    borderColor: Colors.rule,
-    paddingVertical: 6,
-    alignItems: 'center',
-  },
-  cancelBtnText: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 8,
-    color: Colors.textMuted,
-    letterSpacing: 1.5,
-  },
-  deleteBtn: {
-    flex: 1,
-    borderWidth: 0.5,
-    borderColor: Colors.red,
-    paddingVertical: 6,
-    alignItems: 'center',
-  },
-  deleteBtnText: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 8,
-    color: Colors.red,
-    letterSpacing: 1.5,
   },
 });

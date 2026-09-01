@@ -483,8 +483,8 @@ const styles = StyleSheet.create({
   pendingLabel: { fontFamily: Fonts.mono, color: Colors.textMuted },
 
   golfContainer: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  golfText: { gap: 3 },
-  golfScore: { fontFamily: Fonts.monoBold, color: Colors.textPrimary },
+  golfText: { gap: 3, flex: 1, flexShrink: 1 },
+  golfScore: { fontFamily: Fonts.monoBold, color: Colors.textPrimary, flexShrink: 1, flexWrap: 'wrap' },
   golfPar: { fontFamily: Fonts.mono, fontSize: TypeScale.footnote, color: Colors.textMuted },
 
   infinityContainer: { alignItems: 'flex-start', gap: 4 },

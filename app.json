@@ -3,7 +3,7 @@
     "name": "burnmeetr",
     "slug": "burnmeetr",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#FF0000",

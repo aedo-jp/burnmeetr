@@ -149,6 +149,7 @@ export const MetricCard: React.FC<Props> = ({
         visible={expanded}
         animationType="fade"
         transparent
+        supportedOrientations={['portrait', 'landscape']}
         onRequestClose={() => setExpanded(false)}
       >
         <TouchableOpacity
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
   tapHint: {
     fontFamily: Fonts.mono,
     fontSize: 9,
-    color: Colors.textDead,
+    color: Colors.textMuted,
   },
   graphicArea: {
     flex: 1,
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   footnote: {
     fontFamily: Fonts.mono,
     fontSize: TypeScale.footnote,
-    color: Colors.textDead,
+    color: Colors.textMuted,
     lineHeight: 14,
     fontStyle: 'italic',
   },
@@ -277,6 +278,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     lineHeight: 24,
     letterSpacing: -0.3,
+    flexWrap: 'wrap',
   },
   modalGraphicArea: {
     paddingVertical: Spacing.lg,

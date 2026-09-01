@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useWindowDimensions } from 'react-native';
+import React, { useMemo, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useWindowDimensions, Animated as RNAnimated } from 'react-native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
@@ -109,6 +109,138 @@ export const RunningScreen: React.FC<Props> = ({
 
   const allocatedSeconds = allocatedMinutes * 60;
   const progress = Math.min(1, elapsed / allocatedSeconds);
+
+  // Ticker tape for landscape
+  const tickerAnim = useRef(new RNAnimated.Value(0)).current;
+  const activeAttendees = attendees.filter(a => a.count > 0);
+  const tickerItems = activeAttendees.map(a => {
+    const share = totalRate > 0 ? (a.role.ratePerHour * a.count) / totalRate : 0;
+    const groupCost = isIdle ? 0 : cost * share;
+    return `${a.count}× ${a.role.label.split(' /')[0]}  ${sym}${fmt2(groupCost)}`;
+  });
+  const tickerText = tickerItems.length > 0 ? tickerItems.join('   ·   ') + '   ·   ' : '';
+
+  useEffect(() => {
+    if (!isLandscape || tickerText.length === 0) return;
+    tickerAnim.setValue(0);
+    const anim = RNAnimated.loop(
+      RNAnimated.timing(tickerAnim, {
+        toValue: -1,
+        duration: Math.max(8000, tickerText.length * 120),
+        useNativeDriver: true,
+      })
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [isLandscape, tickerText, cost]);
+
+  if (isLandscape) {
+    return (
+      <SafeAreaView
+        style={[styles.safe, isOverrun && styles.safeOverrun]}
+        edges={['top', 'bottom', 'left', 'right']}
+      >
+        <View style={styles.landscapeRow}>
+          {/* Left column — odometer + ticker */}
+          <View style={styles.landscapeLeft}>
+            {/* Status strip compact */}
+            <View style={styles.statusBarLandscape}>
+              <View style={styles.liveRow}>
+                <Animated.View style={[styles.liveDot, dotStyle, isOverrun && styles.liveDotOverrun]} />
+                {isOverrun ? (
+                  <Animated.Text style={[styles.liveText, styles.liveTextOverrun, overrunStyle]}>OVERRUN</Animated.Text>
+                ) : (
+                  <Text style={[styles.liveText, isIdle && styles.liveTextReady]}>{isIdle ? 'READY' : 'LIVE'}</Text>
+                )}
+              </View>
+              <Text style={styles.timeText}>{fmtTime(displayElapsed)}</Text>
+              <Text style={[styles.allocText, isOverrun && styles.allocTextOverrun]}>
+                {isOverrun ? `+${fmtTime(overrunSeconds)}` : `/ ${allocatedMinutes}m`}
+              </Text>
+            </View>
+
+            {/* Progress bar */}
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${progress * 100}%` }, isOverrun && styles.progressFillOverrun]} />
+            </View>
+
+            {/* Odometer — hero */}
+            <View style={styles.meterSectionLandscape}>
+              <Text style={[styles.meterLabel, isOverrun && styles.meterLabelOverrun]}>TOTAL COST</Text>
+              <View
+                style={[styles.odometerBackdrop, isOverrun && styles.odometerBackdropOverrun]}
+                onLayout={(e) => {
+                  const { width: w, height: h } = e.nativeEvent.layout;
+                  setBackdropSize({ width: w, height: h });
+                }}
+              >
+                <Odometer
+                  value={displayCost}
+                  currency={currency}
+                  digitHeight={88}
+                  fontSize={72}
+                  isOverrun={isOverrun}
+                />
+                {backdropSize.width > 0 && (
+                  <OdometerLens width={backdropSize.width} height={backdropSize.height} isOverrun={isOverrun} />
+                )}
+              </View>
+              <Text style={[styles.rateSubtext, isOverrun && styles.rateSubtextOverrun]}>
+                {isIdle ? `${sym}0.0000/sec` : `${sym}${(cost / (elapsed || 1)).toFixed(4)}/sec`}
+              </Text>
+            </View>
+
+            {/* Ticker tape */}
+            {tickerText.length > 0 && (
+              <View style={styles.tickerWrap}>
+                <RNAnimated.Text
+                  style={[
+                    styles.tickerText,
+                    isOverrun && styles.tickerTextOverrun,
+                    { transform: [{ translateX: tickerAnim.interpolate({
+                      inputRange: [-1, 0],
+                      outputRange: [-tickerText.length * 7, 0],
+                    }) }] }
+                  ]}
+                  numberOfLines={1}
+                >
+                  {tickerText}{tickerText}
+                </RNAnimated.Text>
+              </View>
+            )}
+          </View>
+
+          {/* Right column — stats + tall button */}
+          <View style={[styles.landscapeRight, isOverrun && styles.landscapeRightOverrun]}>
+            <View style={styles.landscapeStats}>
+              <View style={styles.landscapeStat}>
+                <Text style={styles.landscapeStatValue}>{sym}{fmt2(isIdle ? 0 : cost / Math.max(1, elapsed) * 60)}</Text>
+                <Text style={styles.landscapeStatLabel}>PER MIN</Text>
+              </View>
+              <View style={styles.landscapeStatDivider} />
+              <View style={styles.landscapeStat}>
+                <Text style={styles.landscapeStatValue}>{totalPeople}</Text>
+                <Text style={styles.landscapeStatLabel}>PEOPLE</Text>
+              </View>
+            </View>
+            <View style={styles.landscapeBtnWrap}>
+              <PanicButton
+                mode={isIdle ? 'start' : 'end'}
+                onPress={isIdle ? onStart : onEnd}
+                landscape={true}
+              />
+            </View>
+            {isIdle && (
+              <TouchableOpacity onPress={onBackToSetup} style={styles.backLinkLandscape}>
+                <Text style={styles.backLinkText}>← EDIT SETUP</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+        {!isLandscape && <InfoBar context={statContext} isOverrun={isOverrun} />}
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -223,7 +355,7 @@ export const RunningScreen: React.FC<Props> = ({
 
       {/* Panic button */}
       <View style={styles.endWrapper}>
-        <PanicButton mode={isIdle ? "start" : "end"} onPress={isIdle ? onStart : onEnd} />
+        <PanicButton mode={isIdle ? "start" : "end"} onPress={isIdle ? onStart : onEnd} landscape={isLandscape} />
       </View>
 
       {/* Info bar — pinned to bottom, hidden in landscape */}
@@ -367,6 +499,88 @@ const styles = StyleSheet.create({
   rateSubtextOverrun: {
     color: Colors.red,
   },
+  // Landscape two-column
+  landscapeRow: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  landscapeLeft: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  landscapeRight: {
+    width: 180,
+    borderLeftWidth: 0.5,
+    borderLeftColor: Colors.rule,
+    backgroundColor: Colors.surface,
+    flexDirection: 'column',
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  landscapeRightOverrun: {
+    backgroundColor: '#0A0000',
+    borderLeftColor: Colors.red,
+  },
+  landscapeStats: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.rule,
+    paddingBottom: Spacing.sm,
+  },
+  landscapeStat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 3,
+  },
+  landscapeStatDivider: {
+    width: 0.5,
+    backgroundColor: Colors.rule,
+  },
+  landscapeStatValue: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 13,
+    color: Colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  landscapeStatLabel: {
+    fontFamily: Fonts.mono,
+    fontSize: 7,
+    color: Colors.textMuted,
+    letterSpacing: 1.5,
+  },
+  landscapeBtnWrap: {
+    flex: 1,
+    paddingVertical: Spacing.sm,
+  },
+  meterSectionLandscape: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  backLinkLandscape: {
+    alignSelf: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  // Ticker tape
+  tickerWrap: {
+    overflow: 'hidden',
+    borderTopWidth: 0.5,
+    borderTopColor: Colors.rule,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+  },
+  tickerText: {
+    fontFamily: Fonts.mono,
+    fontSize: 10,
+    color: Colors.textMuted,
+    letterSpacing: 0.5,
+  },
+  tickerTextOverrun: {
+    color: Colors.red,
+  },
+
   groupStrip: {
     flexGrow: 0,
     borderTopWidth: 0.5,
