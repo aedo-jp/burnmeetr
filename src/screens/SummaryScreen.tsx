@@ -294,7 +294,12 @@ export const SummaryScreen: React.FC<Props> = ({
           </View>
         </View>
 
-
+        {/* Actions */}
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.invoiceBtn} onPress={handleSendInvoice}>
+            <Text style={styles.invoiceBtnText}>SEND INVOICE</Text>
+          </TouchableOpacity>
+        </View>
 
       </ScrollView>
     </SafeAreaView>
@@ -385,7 +390,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   overrunValue: {
-    color: '#FF3322',
+    color: Colors.red,
   },
 
   // Metric zone
