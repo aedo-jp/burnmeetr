@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   tickerUp: { color: Colors.teal },
-  tickerDown: { color: Colors.red },
+  tickerDown: { color: '#FF3322' },
   headerSpacer: { flex: 1 },
 
   periodRow: {
@@ -393,8 +393,8 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 7,
-    color: Colors.textMuted,
+    fontSize: 10,
+    color: Colors.textSecondary,
     letterSpacing: 1,
   },
   infoValue: {

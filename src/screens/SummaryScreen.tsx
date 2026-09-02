@@ -47,8 +47,7 @@ export const SummaryScreen: React.FC<Props> = ({
   fxRates, history, analytics, daysSinceFirstLaunch,
   onNewMeeting, onDeleteSession,
 }) => {
-  const { width, height } = useWindowDimensions();
-  const isWide = width >= 768;
+  const { width } = useWindowDimensions();
   const config = OdometerConfig[currency] ?? OdometerConfig['USD'];
   const sym = config.symbol;
   const fx = fxRates[currency] ?? 1;
@@ -188,13 +187,9 @@ export const SummaryScreen: React.FC<Props> = ({
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[styles.content, isWide && styles.contentWide]}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-
-        {/* Wide layout: two-column row */}
-        <View style={isWide ? styles.wideRow : undefined}>
-        <View style={isWide ? styles.wideLeft : undefined}>
 
         {/* ── Zone 1: MEET:AX Graph ───────────────────────────────────────── */}
         <Animated.View style={[styles.zone, makeEntrance(graphAnim)]}>
@@ -238,9 +233,6 @@ export const SummaryScreen: React.FC<Props> = ({
 
         <View style={styles.zoneRule} />
 
-        </View>{/* /wideLeft */}
-        <View style={isWide ? styles.wideRight : undefined}>
-
         {/* ── Zone 2: Metric cards ────────────────────────────────────────── */}
         <Animated.View style={[styles.metricZone, makeEntrance(metricsAnim)]}>
           <View style={styles.metricHeader}>
@@ -277,9 +269,6 @@ export const SummaryScreen: React.FC<Props> = ({
             <Text style={styles.starRating}>{starRating}</Text>
           )}
         </Animated.View>
-
-        </View>{/* /wideRight */}
-        </View>{/* /wideRow */}
 
         <View style={styles.zoneRule} />
 
@@ -396,7 +385,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   overrunValue: {
-    color: Colors.red,
+    color: '#FF3322',
   },
 
   // Metric zone
@@ -488,21 +477,6 @@ const styles = StyleSheet.create({
     fontSize: 7,
     color: Colors.textMuted,
     letterSpacing: 1,
-  },
-
-  // Wide layout
-  contentWide: {},
-  wideRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  wideLeft: {
-    flex: 3,
-    borderRightWidth: 0.5,
-    borderRightColor: Colors.rule,
-  },
-  wideRight: {
-    flex: 2,
   },
 
   // Actions

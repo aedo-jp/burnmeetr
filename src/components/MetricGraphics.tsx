@@ -112,7 +112,7 @@ export const BarGraphic: React.FC<{
       </View>
       {(leftLabel || rightLabel) && (
         <View style={styles.barLabels}>
-          {leftLabel && <Text style={[styles.barLabel, { color: Colors.red }]}>{leftLabel}</Text>}
+          {leftLabel && <Text style={[styles.barLabel, { color: '#FF3322' }]}>{leftLabel}</Text>}
           {rightLabel && <Text style={[styles.barLabel, { color: Colors.teal }]}>{rightLabel}</Text>}
         </View>
       )}
@@ -275,7 +275,7 @@ export const InfinityGraphic: React.FC<{
       <Animated.Text style={[{
         fontFamily: Fonts.monoBold,
         fontSize,
-        color: Colors.red,
+        color: '#FF3322',
         lineHeight: fontSize + 4,
         letterSpacing: -1,
       }, pulseStyle]}>∞</Animated.Text>
@@ -430,7 +430,7 @@ export const VerticalBarGraphic: React.FC<{
           <Animated.Text style={[{
             fontFamily: Fonts.monoBold,
             fontSize: valueFontSize,
-            color: Colors.red,
+            color: '#FF3322',
             marginBottom: 4,
           }, valStyle]}>{leftPercent}%</Animated.Text>
           <Animated.View style={[{
@@ -454,7 +454,7 @@ export const VerticalBarGraphic: React.FC<{
       </View>
       {/* Labels */}
       <View style={{ flexDirection: 'row', gap: 8 }}>
-        <Text style={{ fontFamily: Fonts.monoBold, fontSize: labelFontSize, color: Colors.red, width: barWidth, textAlign: 'center', letterSpacing: 0.5 }}>
+        <Text style={{ fontFamily: Fonts.monoBold, fontSize: labelFontSize, color: '#FF3322', width: barWidth, textAlign: 'center', letterSpacing: 0.5 }}>
           {leftLabel}
         </Text>
         <Text style={{ fontFamily: Fonts.monoBold, fontSize: labelFontSize, color: Colors.teal, width: barWidth, textAlign: 'center', letterSpacing: 0.5 }}>
@@ -471,12 +471,12 @@ const styles = StyleSheet.create({
   barTrack: { backgroundColor: Colors.tealFaint, overflow: 'hidden', width: '100%' },
   barFill: { backgroundColor: Colors.teal },
   barLabels: { flexDirection: 'row', justifyContent: 'space-between' },
-  barLabel: { fontFamily: Fonts.mono, fontSize: 8, letterSpacing: 1 },
+  barLabel: { fontFamily: Fonts.mono, fontSize: 10, color: Colors.textSecondary, letterSpacing: 1 },
 
   loadingContainer: { gap: 10, width: '100%' },
   loadingTrack: { backgroundColor: Colors.tealFaint, overflow: 'hidden', width: '100%' },
   loadingShimmer: { position: 'absolute', top: 0, left: 0, width: '40%', backgroundColor: Colors.teal, opacity: 0.7 },
-  loadingLabel: { fontFamily: Fonts.mono, fontSize: 9, color: Colors.textMuted, fontStyle: 'italic', letterSpacing: 0.5 },
+  loadingLabel: { fontFamily: Fonts.mono, fontSize: 10, color: Colors.textSecondary, fontStyle: 'italic', letterSpacing: 0.5 },
 
   pendingContainer: { flexDirection: 'row', alignItems: 'center' },
   pendingRing: { borderWidth: 2, borderColor: Colors.tealDim, borderTopColor: Colors.teal },

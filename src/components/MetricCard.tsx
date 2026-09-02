@@ -177,7 +177,7 @@ export const MetricCard: React.FC<Props> = ({
             {/* TLR coloured ratio */}
             {value.displayType === 'visual_bar' && value.primary && value.secondary && (
               <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 2 }}>
-                <Text style={[styles.modalValue, { color: Colors.red }]}>{value.primary}</Text>
+                <Text style={[styles.modalValue, { color: '#FF3322' }]}>{value.primary}</Text>
                 <Text style={[styles.modalValue, { color: Colors.textMuted, fontSize: 20 }]}>:</Text>
                 <Text style={[styles.modalValue, { color: Colors.teal }]}>{value.secondary}</Text>
               </View>
@@ -299,8 +299,8 @@ const styles = StyleSheet.create({
   },
   formulaLabel: {
     fontFamily: Fonts.monoBold,
-    fontSize: 8,
-    color: Colors.textMuted,
+    fontSize: 10,
+    color: Colors.textSecondary,
     letterSpacing: 2,
   },
   formulaText: {

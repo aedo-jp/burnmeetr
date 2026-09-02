@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3,
   },
   labelDisabled: { color: 'rgba(255,255,255,0.3)' },
-  subLabel: { fontFamily: 'JetBrainsMono', fontSize: 9, letterSpacing: 2, color: '#444' },
+  subLabel: { fontFamily: 'JetBrainsMono', fontSize: 9, letterSpacing: 2, color: 'rgba(240,240,240,0.50)' },
   subLabelDisabled: { color: '#2A2A2A' },
 
   // Landscape rectangle
@@ -206,6 +206,6 @@ const styles = StyleSheet.create({
     fontFamily: 'JetBrainsMono',
     fontSize: 9,
     letterSpacing: 2,
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255,255,255,0.75)',
   },
 });

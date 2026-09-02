@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     fontFamily: 'JetBrainsMono-Bold',
     fontSize: 20,
     letterSpacing: 4,
-    color: '#CC2200',
+    color: '#FF3322',
   },
   landscapeReadyTextPressed: {
     color: '#F0F0F0',
@@ -527,8 +527,8 @@ const styles = StyleSheet.create({
   },
   landscapeReadyHint: {
     fontFamily: 'JetBrainsMono',
-    fontSize: 9,
-    color: 'rgba(240,240,240,0.3)',
+    fontSize: 10,
+    color: 'rgba(240,240,240,0.5)',
     letterSpacing: 1,
   },
 
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   confirmBtn: { width: '100%', borderWidth: 0.5, borderColor: Colors.red, paddingVertical: Spacing.md, alignItems: 'center', backgroundColor: 'transparent' },
   confirmBtnPressed: { backgroundColor: Colors.red, borderColor: Colors.red },
   confirmBtnDisabled: { borderColor: Colors.rule },
-  confirmBtnText: { fontFamily: Fonts.monoBold, fontSize: TypeScale.label, letterSpacing: 4, color: Colors.red },
+  confirmBtnText: { fontFamily: Fonts.monoBold, fontSize: TypeScale.label, letterSpacing: 4, color: '#FF3322' },
   confirmBtnTextPressed: { color: Colors.white },
   confirmBtnTextDisabled: { color: Colors.textDead },
   confirmHint: { fontFamily: Fonts.mono, fontSize: TypeScale.footnote, color: Colors.textMuted, letterSpacing: 0.5 },
